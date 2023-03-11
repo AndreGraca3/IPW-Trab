@@ -1,0 +1,53 @@
+ <style>
+    label {
+        vertical-align: top;
+    }
+    .center {
+  position: absolute;
+  left: 5%;
+}
+    
+</style>
+
+<h2>{{title}}</h2>
+<div>
+    <p>
+      <label>Name: </label> <textarea id="group" type="text" style="width: auto;" placeholder="{{group.name}}" required></textarea>
+    </p>
+    <p>
+      <label>Description: </label> <textarea style="width:auto;" id="group" placeholder="{{group.description}}" required></textarea>
+    </p>
+    <button id="b1" class="btn btn-warning center">{{title}}</button>
+
+</div>
+
+<script>
+  window.addEventListener('load', loadHandler)
+
+  function loadHandler(){
+      const button = document.querySelector('#b1')
+      button.addEventListener('click', buttonHandler)
+  }
+           
+  async function buttonHandler(){    
+    const inputTexts = document.querySelectorAll('#group')
+    let name = inputTexts[0].value
+    let description = inputTexts[1].value
+
+    const uri = '{{link}}{{group.id}}'
+    const options = {
+      method : "{{method}}",
+      body : JSON.stringify({name, description}),
+      headers : {
+        'Content-Type' : 'application/json',
+        'Accept' : 'application/json',
+        'Authorization' : "{{user.token}}"
+      }
+    }
+    const rsp = await fetch(uri,options)
+    if(rsp.ok) {
+      location = '/site/groups'
+    }
+  }
+  
+</script>

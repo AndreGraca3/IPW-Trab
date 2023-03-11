@@ -1,0 +1,39 @@
+<h1>{{title}}</h1>
+<p><a href="group/new">Create a new Group</a></p>
+
+{{#each groups}}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <a style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;" href="/site/group/{{id}}" class="card-title">{{name}}</a>
+    <p class="card-text">{{description}}</p>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item">{{totalduration}} mins.</li>
+    </ul>
+      <form style="float: left;" action="/site/editGroup/{{id}}" method="GET">
+        <button class="btn btn-warning">Edit</button>
+      </form> 
+      <button style="float: right;" id="b1" groupId="{{id}}" type="button" class="btn btn-danger">Delete</button>
+  </div>
+</div>
+<hr>
+{{/each}}
+
+<script>
+   const deleteBtnList = document.querySelectorAll("#b1")
+
+  for(let i = 0; i < deleteBtnList.length; i++){
+    deleteBtnList[i].onclick = deleteBtnClickHander
+  }
+
+  async function deleteBtnClickHander(){
+    const uri = `/api/favoriteMovies/${this.getAttribute("groupId")}`
+    const options = {
+      method : "delete",
+      headers : {
+        'Authorization' : "{{user.token}}"
+      }
+    }
+    const rsp = await fetch(uri,options)
+    if(rsp.ok) location.reload()
+  }
+</script>

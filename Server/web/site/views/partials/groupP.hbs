@@ -1,0 +1,71 @@
+<h3>{{title}}</h3>
+<p>{{group.description}}</p>
+
+<div style="float: right;">
+  <input id="b2" type="text" style="width: auto;" name="name" placeholder="Movie name" required></input>
+</div>
+
+<table id="b77" class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="col">id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Plot</th>
+      <th scope="col">Duration</th>
+      <th scope="col">Total Duration</th>
+    </tr>
+  </thead>
+  {{#each group.movies}}
+  <tbody class="t_body">
+    <tr>
+      <th scope="row">{{id}}</th>
+      <td class="name">{{title}}</td>
+      <td>{{plot}}</td>
+      <td>{{duration}}</td>
+      <td>
+        <button id="bd" moviedId="{{this.id}}" movies="{{../this.group.movies}}"groupId="{{../this.group.id}}" class="btn btn-danger">Delete</button>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>  
+  <td colspan="4"></td>
+  <td>{{group.totalduration}}</td>
+</table>
+
+<script>
+  window.addEventListener('load', loadHandler)
+  const input = document.querySelector('#b2')
+  function loadHandler(){
+    const btnList = document.querySelectorAll("#bd")
+    for(let i = 0; i< btnList.length; i++) {
+      btnList[i].addEventListener('click', clickHandler)
+    }
+    input.addEventListener('keyup', filter)
+  function filter() {
+    console.log(input.value)
+        const table = document.querySelector('#b77')
+        let items = document.querySelectorAll('.t_body')
+        let itemsnames = document.querySelectorAll('.t_body .name')
+        itemsnames.forEach(function(item, idx) {
+        if(!item.textContent.toLowerCase().includes(input.value.toLowerCase())){
+           items[idx].style.display = "none"
+        } else {
+          items[idx].style.display = "table-row-group"
+        }
+      })
+  }
+  }
+  
+
+  async function clickHandler(){
+    const uri = `/api/favoriteMovies/${this.getAttribute("groupId")}/movies/${this.getAttribute("moviedId")}`
+    const options = {
+      method : "delete",
+      headers : {
+        'Authorization' : "{{user.token}}"
+      }
+    }
+    const rsp = await fetch(uri,options)
+    if(rsp.ok) location.reload()
+  }     
+</script>

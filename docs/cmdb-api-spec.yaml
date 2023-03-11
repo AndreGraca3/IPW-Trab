@@ -1,0 +1,453 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Tasks API
+  description: This is a simple Tasks API
+  # put the contact info for your development or API team
+  contact:
+    email: you@your-company.com
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+tags :
+  - name: movies
+
+paths:
+  /moviesPopular:
+    get:
+      summary: get most popular movies
+      operationId: getPopularMovies
+      description: 
+        gets the list of the most popular movies. this request has an optional 
+        parameter to limit the number of returned movies(query).
+      tags:
+      - movies
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: limit
+        description: maximum number of movies to return
+        type: integer
+        minimum: 1
+        maximum: 250
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/popularMovie'
+        404:
+          description: movies not found
+        500:
+          description: internal server error.
+  
+  /movie/{name}:
+    get:
+      summary: Get a movie by the given its name
+      description: Get a movie by the given its name
+      operationId: getMovieByName
+      tags:
+      - movies
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: limit
+        description: maximum number of movies to return
+        type: integer
+        minimum: 1
+        maximum: 250
+      - name: name
+        in: path
+        description: Name of movie that to be fetched
+        required: true
+        type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/movieByName'
+        400:
+          description: Invalid Name supplied
+        404:
+          description: Movie not found
+        500:
+          description: internal server error.
+          
+#Favorite movies :      
+  #create:
+  /favoriteMovies:
+    post:
+      summary: creates a group providing its name and description.
+      operationId: create
+      description: creates a group.
+      tags:
+      - Favorite movies
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: header
+        name: token
+        description: token of the correspoding user.
+        required: true
+        type: string
+      - in: body
+        name: description
+        description: description of the group
+        required: true
+        schema:
+          $ref: '#/definitions/newGroup'
+      responses:
+        201:
+          description: group created
+        400:
+          description: invalid name or description
+        409:
+          description: group already exists
+        500:
+          description: internal server error.  
+  #list:
+    get:
+      summary: get list of all groups.
+      operationId: list
+      description: gets the list of all groups.
+      tags:
+      - Favorite movies
+      produces:
+      - application/json
+      parameters:
+      - in: header
+        name: token
+        description: token of the corresponding user
+        required: true
+        type: string
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/groupDetails'
+        401:
+          description: invalid token
+        404:
+          description: user not found or group not found        
+        500:
+          description: internal server error.  
+  #edit:
+  /favoriteMovies/{group_id}:
+    put:
+      summary: edits a group by changing its name and description
+      operationId: edit
+      description: edits a group
+      tags:
+      - Favorite movies
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: group_id
+        in: path
+        description: name of the group
+        required : true
+        type: string
+      - in: header
+        name: token
+        description: token of the correspoding user
+        required: true
+        type: string
+      - in: body
+        name: description
+        description: new description of the group
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/newGroup'
+      responses:
+        204:
+          description: group edited
+        400:
+          description: invalid name or description
+        404:
+          description: group not found or user not found
+        500:
+          description: internal server error.
+  #delete:
+    delete:
+      summary: deletes a group.
+      operationId : delete
+      description: deletes a group of favorite movies.
+      tags:
+      - Favorite movies
+      consumes:
+      - application/json
+      parameters:
+      - name: group_id
+        in: path
+        description: name of the group.
+        required : true
+        type: string
+      - in: header
+        name: token
+        description: token of the corresponding user
+        required: true
+        type: string
+      responses:
+        200:
+          description: group deleted successfully
+        404:
+          description: group not found or user not found
+        500:
+          description: internal server error.
+  #detais
+    get:
+      summary: get the details of group.
+      operationId: details
+      description: get the details of group, with its name, description, the names of movies and total duration of the included movies.
+      tags:
+      - Favorite movies
+      produces:
+      - application/json
+      parameters:
+      - name: group_id
+        in: path
+        description: name of the group.
+        required: true
+        type: string
+      - in: header
+        name: token
+        description: token of the corresponding user
+        required: true
+        type: string
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/groupDetails'
+        404:
+            description: group not found  
+        500:
+          description: internal server error.
+  #add
+  /favoriteMovies/{group_id}/movies/{movie_id}:
+    put:
+      summary: add a movie to a group
+      operationId: add
+      description: add a movie to a group
+      tags:
+      - Favorite movies  
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: group_id
+        in: path
+        description: name of the group
+        required: true
+        type: string
+      - in: header
+        name: token
+        description: token of the corresponding user
+        required: true
+        type: string
+      - in: path
+        name : movie_id
+        description : id of movie
+        required: true
+        type : string
+      - in: body
+        name: movie
+        description: new movie to add to the group
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/movie'
+      responses:
+        200:
+          description: movie added successfully
+        404:
+          description: group not found or movie not found or user not found
+        500:
+          description: internal server error. 
+  #remove
+    delete:
+      summary: remove a movie from a group
+      operationId: remove
+      description: remove a movie from a group
+      tags:
+      - Favorite movies
+      consumes:  
+      - application/json
+      parameters:  
+      - name: group_id
+        in: path
+        description: name of the group
+        required: true
+        type: string
+      - in: header
+        name: token
+        description: token of the corresponding user
+        required: true
+        type: string
+      - in: path
+        name: movie_id
+        required: true
+        type: string
+      responses:  
+        200:
+          description: movie removed successfully
+        404:
+          description: group not found, user not found, movie not found or body empty
+        500:
+          description: internal server error.
+  #newUser    
+  /user:  
+    post:
+      summary: creates a new user
+      operationId: user
+      description: creates a new user
+      tags: 
+      - Favorite movies
+      consumes:
+      - application/json
+      produces:  
+      - application/json
+      parameters:
+      - in: body  
+        name: nameUser
+        description: name of the user
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/nameUser'
+      responses:  
+        201:
+          description: user created successfully
+          schema:
+            $ref: '#/definitions/user'
+        400:
+          description: missing or invalid name
+        500:
+          description: internal server error. 
+          
+definitions:
+  popularMovie:
+    type: object
+    required:
+    - id
+    - rank
+    - title
+    - year
+    properties:
+      id:
+        type: string
+        example: "tt0111161"
+      rank:
+        type: integer
+        example: 1
+      title:
+        type: string
+        example: "The Shawshank Redemption"
+      year:
+        type: integer
+        example: 1994
+  
+  movieByName:
+    type: object
+    required:
+    - id
+    - title
+    properties:
+      id: 
+        type: string
+        example: "tt0111161"
+      title:
+        type: string
+        example: "The Shawshank Redemption"
+        
+  movie:
+    type: object
+    required:
+    - movieId
+    - movieTitle
+    - movieAuthor
+    properties:
+      movieId:
+        type: integer
+        example: 1
+      movieTitle:
+        type: string
+        example: "Avatar"
+      movieAuthor:
+        type : string
+        example : "Helena Tavares"
+        
+  newGroup:
+    type: object
+    required:
+    - name
+    - description
+    properties:
+      name:
+        type: string
+        example: MyFavMovies
+      description:
+        type: string
+        example : My favorite movies of all time.
+  
+  groupDetails:
+    type: object
+    required:
+    - name
+    - description
+    - names
+    - totalDuration
+    properties:
+      name:
+        type: string
+        example: "group 2"
+      description:
+        type: string
+        example: My favorite comedy movies.
+      totalDuration:
+        type: integer
+        example: "90"
+      movies:
+        type: array
+        items: 
+          type: object
+          example: {id: tt292929, name : "Cars", plot: "Carros que falam", duration: 90}
+  
+  user:
+    type: object
+    required:
+    - token
+    properties:
+      token:
+        type: array
+        items:
+          type: object
+          example: {id:0, name: Diogo, password:"123", token:"36b8f84d-df4e-4d49-b662-bcde71a8764f"}
+  
+  nameUser:
+    type: object
+    required:
+    - name
+    - password
+    properties:
+      name:
+        type: string
+        example: "Diogo"
+      password:
+        type: string
+        example: "123"

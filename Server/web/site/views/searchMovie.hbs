@@ -1,0 +1,45 @@
+<h1>{{title}}</h1>
+
+{{#each movies}}
+<div class="card" style="width: fit-content;">
+  <div class="card-body">
+    <div style="color: black;">
+      <a style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;" class="card-title">{{title}}</a>
+      <div class="btn-group dropend">
+      {{#if ../groups}}
+      <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        +
+      </button>
+    {{/if}}
+      <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdown">
+        {{#each ../groups}}
+          <input type="button" id="b1" class="dropdown-item" movieId="{{../id}}" groupId="{{id}}" value="{{name}}"></input>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+  </div>
+</div>
+<hr>
+{{/each}}
+
+
+<script>
+  const btnList = document.querySelectorAll("#b1")
+
+  for(let i = 0; i < btnList.length; i++){
+    btnList[i].onclick = clickHander
+  }
+
+  async function clickHander(){
+    const uri = `/api/favoriteMovies/${this.getAttribute("groupId")}/movies/${this.getAttribute("movieId")}`
+    const options = {
+      method : "PUT",
+      headers : {
+        'Authorization' : "{{user.token}}"
+      }
+    }
+    const rsp = await fetch(uri,options)
+    if(rsp.ok) alert("Movie added successfully!")
+  }
+</script>
